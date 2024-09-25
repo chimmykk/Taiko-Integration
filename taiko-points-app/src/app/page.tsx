@@ -5,16 +5,15 @@ import axios from 'axios';
 
 export default function Home() {
   const [userAddress, setUserAddress] = useState('');
-  const [points, setPoints] = useState<number | null>(null); // Allow null
-  const [taikoPoints, setTaikoPoints] = useState<number | null>(null); // Allow null
-  const [integratedPoints, setIntegratedPoints] = useState<number | null>(null); // Allow number or null
+  const [points, setPoints] = useState<number | null>(null);
+  const [taikoPoints, setTaikoPoints] = useState<number | null>(null);
+  const [integratedPoints, setIntegratedPoints] = useState<number | null>(null);
   const [error, setError] = useState('');
 
   const handleWalletConnected = (walletAddress: SetStateAction<string>) => {
     setUserAddress(walletAddress);
   };
 
-  // Fetch points from Taiko Trailblazers Official
   const fetchPoints = async () => {
     setError('');
     setPoints(null);
@@ -32,7 +31,6 @@ export default function Home() {
       const data = response.data;
       let foundScore = null;
 
-      // Search through the items array for matching address
       for (const entry of data) {
         for (const item of entry.items) {
           if (item.address.toLowerCase() === userAddress.toLowerCase()) {
@@ -54,7 +52,6 @@ export default function Home() {
     }
   };
 
-  // Fetch points from Taiko Trailblazers API
   const fetchTaikoPoints = async () => {
     setError('');
     setTaikoPoints(null);
@@ -69,12 +66,12 @@ export default function Home() {
         'http://localhost:3000/api/getmintpadpoints'
       );
 
-      const data = response.data; 
+      const data = response.data;
       let foundScore = null;
 
       for (const item of data) {
         if (item.holder.toLowerCase() === userAddress.toLowerCase()) {
-          foundScore = item.points; 
+          foundScore = item.points;
           break;
         }
       }
@@ -92,20 +89,16 @@ export default function Home() {
 
   const integratePoints = () => {
     if (points !== null && taikoPoints !== null) {
-      setIntegratedPoints(points + taikoPoints); // No type error
+      setIntegratedPoints(points + taikoPoints);
     } else {
       setError('Please fetch both points before integrating.');
     }
   };
 
   return (
-    <div styles={styles.container}>
+    <div style={styles.container}>
       <h1>Taiko Points Aggregator</h1>
-      
-      {/* MetaMask Connect */}
       <ConnectWallet onWalletConnected={handleWalletConnected} />
-      
-      {/* Wallet Address Input */}
       <div style={styles.inputContainer}>
         <input
           type="text"
@@ -118,9 +111,7 @@ export default function Home() {
           Fetch Points From TaikoTrailblazer Official
         </button>
       </div>
-      
-      {/* New input for fetching points from Taiko Trailblazers */}
-      <div styles={styles.inputContainer}>
+      <div style={styles.inputContainer}>
         <input
           type="text"
           placeholder="Fetch points for Taiko Trailblazers"
@@ -132,15 +123,11 @@ export default function Home() {
           Fetch Points From Taiko Trailblazers By Mintpad.co
         </button>
       </div>
-
-      {/* Integrate Points Button */}
       <div style={styles.inputContainer}>
         <button onClick={integratePoints} style={styles.button}>
           Integrate Points
         </button>
       </div>
-
-      {/* Display Points or Error */}
       {error && <p style={styles.error}>{error}</p>}
       {points !== null && (
         <p style={styles.points}>
@@ -161,7 +148,6 @@ export default function Home() {
   );
 }
 
-// Styling for UI components
 const styles = {
   container: {
     display: 'flex',
@@ -169,10 +155,10 @@ const styles = {
     alignItems: 'center',
     justifyContent: 'center',
     height: '100vh',
-    backgroundColor: '#ffffff',
+    backgroundColor: 'black',
     fontFamily: 'Arial, sans-serif',
     padding: '20px',
-  },
+  } as React.CSSProperties,
   button: {
     padding: '12px 24px',
     backgroundColor: '#0070f3',
@@ -180,33 +166,38 @@ const styles = {
     border: 'none',
     borderRadius: '8px',
     cursor: 'pointer',
-    marginTop: '20px',
     fontSize: '16px',
-  },
+    width: '220px', // Fixed width for better alignment
+    marginLeft: '10px', // Add margin to separate from the input field
+  } as React.CSSProperties,
   inputContainer: {
     display: 'flex',
     flexDirection: 'row',
-    marginTop: '20px',
+    justifyContent: 'center',
     alignItems: 'center',
-  },
+    width: '100%', // Full width of container
+    maxWidth: '600px', // Set a max-width for better alignment
+    marginTop: '20px',
+  } as React.CSSProperties,
   input: {
     padding: '12px',
-    marginRight: '10px',
     borderRadius: '8px',
     border: '2px solid #ccc',
-    width: '320px',
+    width: '70%', // Width adjusted for input
     fontSize: '16px',
     color: 'black',
-  },
+  } as React.CSSProperties,
   error: {
     color: 'red',
     marginTop: '20px',
     fontSize: '18px',
-  },
+    textAlign: 'center', // Center error message
+  } as React.CSSProperties,
   points: {
     marginTop: '20px',
     fontSize: '22px',
     fontWeight: 'bold',
-    color: 'white', // Change this to your desired color
-  },
+    color: 'white', // Updated to stand out on black background
+    textAlign: 'center', // Center points text
+  } as React.CSSProperties,
 };
