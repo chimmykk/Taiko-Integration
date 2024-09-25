@@ -1,4 +1,3 @@
-// components/ConnectWallet.js
 import { useState } from 'react';
 import { ethers } from 'ethers';
 
@@ -9,7 +8,8 @@ export default function ConnectWallet({ onWalletConnected }) {
   const connectWallet = async () => {
     if (typeof window !== 'undefined' && window.ethereum) {
       try {
-        const provider = new ethers.providers.Web3Provider(window.ethereum);
+        // Ensure ethers is loaded correctly and MetaMask is available
+        const provider = new ethers.BrowserProvider(window.ethereum); // Update this line for ethers v6+
         const accounts = await provider.send('eth_requestAccounts', []);
         setWalletAddress(accounts[0]);
         if (onWalletConnected) {
