@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import { SetStateAction, useState } from 'react';
 import ConnectWallet from '../../components/ ConnectWallet';
 import axios from 'axios';
@@ -6,6 +6,7 @@ import axios from 'axios';
 export default function Home() {
   const [userAddress, setUserAddress] = useState('');
   const [points, setPoints] = useState(null);
+  const [taikoPoints, setTaikoPoints] = useState(null); // New state for Taiko Trailblazers points
   const [error, setError] = useState('');
 
   // Handle wallet connection from ConnectWallet component
@@ -53,16 +54,52 @@ export default function Home() {
     }
   };
 
+  // Fetch points from Taiko Trailblazers API
+  const fetchTaikoPoints = async () => {
+    setError('');
+    setTaikoPoints(null);
+
+    if (!userAddress) {
+      setError('Please enter a valid wallet address');
+      return;
+    }
+
+    try {
+      const response = await axios.get(
+        'http://localhost:3000/api/getmintpadpoints' // Adjust this URL to your API endpoint
+      );
+
+      const data = response.data; // Assuming data is an array of objects
+      let foundScore = null;
+
+      // Search through the data structure for matching holder address
+      for (const item of data) {
+        if (item.holder.toLowerCase() === userAddress.toLowerCase()) {
+          foundScore = item.points; // Accessing points directly
+          break;
+        }
+      }
+
+      if (foundScore !== null) {
+        setTaikoPoints(foundScore);
+      } else {
+        setError('Address not found in Taiko Trailblazers');
+      }
+    } catch (err) {
+      console.error('Error fetching data from Taiko Trailblazers:', err);
+      setError('Failed to fetch Taiko points');
+    }
+  };
+
   return (
     <div styles={styles.container}>
-      
-      <h1>Taiko Points Fetcher</h1>
+      <h1>Taiko Points Aggregator</h1>
       
       {/* MetaMask Connect */}
       <ConnectWallet onWalletConnected={handleWalletConnected} />
       
       {/* Wallet Address Input */}
-      <div style={styles.inputContainer}>
+      <div styles={styles.inputContainer}>
         <input
           type="text"
           placeholder="Enter wallet address"
@@ -71,15 +108,34 @@ export default function Home() {
           style={styles.input}
         />
         <button onClick={fetchPoints} style={styles.button}>
-          Fetch Points
+          Fetch Points From TaikoTrailblazer Official
         </button>
       </div>
       
+      {/* New input for fetching points from Taiko Trailblazers */}
+      <div styles={styles.inputContainer}>
+        <input
+          type="text"
+          placeholder="Fetch points for Taiko Trailblazers"
+          value={userAddress}
+          onChange={(e) => setUserAddress(e.target.value)}
+          style={styles.input}
+        />
+        <button onClick={fetchTaikoPoints} style={styles.button}>
+          Fetch Points From Taiko Trailblazers By Mintpad.co
+        </button>
+      </div>
+
       {/* Display Points or Error */}
       {error && <p style={styles.error}>{error}</p>}
       {points !== null && (
         <p style={styles.points}>
-          Total Points: {points}
+          Total Points From TaikoTrailblazer official: {points}
+        </p>
+      )}
+      {taikoPoints !== null && (
+        <p style={styles.points}>
+          Total Points From Taiko Trailblazers by Mintpad: {taikoPoints}
         </p>
       )}
     </div>
@@ -132,6 +188,8 @@ const styles = {
     marginTop: '20px',
     fontSize: '22px',
     fontWeight: 'bold',
-    color: '#333', // Dark color for points visibility
+    color: 'white', // Changed to white for visibility
   },
 };
+
+
