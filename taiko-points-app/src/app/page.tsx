@@ -63,7 +63,7 @@ export default function Home() {
 
     try {
       const response = await axios.get(
-        'http://localhost:3000/api/getmintpadpoints'
+        'https://taiko-integration.vercel.app/api/getmintpadpoints'
       );
 
       const data = response.data;
