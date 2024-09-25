@@ -114,7 +114,7 @@ export default function Home() {
       <div style={styles.inputContainer}>
         <input
           type="text"
-          placeholder="Fetch points for Taiko Trailblazers"
+          placeholder="Enter wallet address to Fetch points "
           value={userAddress}
           onChange={(e) => setUserAddress(e.target.value)}
           style={styles.input}
